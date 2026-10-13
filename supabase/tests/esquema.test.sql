@@ -60,3 +60,23 @@ do $$ begin
 exception when check_violation then
   raise notice 'ok: coherencia origen/pedido';
 end $$;
+
+-- Fase 2: elegir imagen
+set request.jwt.claim.sub = '00000000-0000-0000-0000-000000000001';
+select elegir_imagen(1, 'https://assets.tcgdex.net/ja/SM/SM12a/16/high.webp', 'SM12a-016');
+select pg_temp.esperar(imagen_url like 'https://assets.tcgdex.net/%' and tcgdex_id = 'SM12a-016', 'elegir imagen')
+  from productos where id_producto = 1;
+do $$ begin
+  perform elegir_imagen(1, 'javascript:alert(1)');
+  raise exception 'FALLO: se aceptó una URL que no es https';
+exception when raise_exception then
+  if sqlerrm like 'FALLO%' then raise; end if;
+  raise notice 'ok: imagen sin https rechazada';
+end $$;
+do $$ begin
+  update productos set nombre = 'x' where id_producto = 1;
+  if found then raise exception 'FALLO: un usuario pudo editar el catálogo'; end if;
+  raise notice 'ok: catálogo no editable';
+exception when insufficient_privilege then
+  raise notice 'ok: catálogo no editable';
+end $$;

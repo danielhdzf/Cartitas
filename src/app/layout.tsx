@@ -23,9 +23,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="es" className={`${geist.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <header className="border-b border-borde">
-          <nav className="mx-auto flex w-full max-w-3xl items-center gap-5 px-4 py-3">
+          <nav className="mx-auto flex w-full max-w-3xl flex-wrap items-center gap-x-5 gap-y-1 px-4 py-3">
             <Link href="/" className="font-semibold">Cartitas</Link>
-            <Link href="/cartas" className="text-sm text-apagado hover:text-texto">Buscar cartas</Link>
+            <Link href="/coleccion" className="text-sm text-apagado hover:text-texto">Colección</Link>
+            <Link href="/pedidos" className="text-sm text-apagado hover:text-texto">Pedidos</Link>
+            <Link href="/cartas" className="text-sm text-apagado hover:text-texto">Precios</Link>
           </nav>
         </header>
         {children}
