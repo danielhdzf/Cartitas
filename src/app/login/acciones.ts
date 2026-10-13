@@ -1,23 +1,52 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { configSupabase } from "@/lib/supabase/config";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
-export type EstadoLogin = { error?: string; enviado?: boolean };
+export type EstadoLogin = { error?: string; email?: string };
 
-export async function enviarEnlace(_: EstadoLogin, datos: FormData): Promise<EstadoLogin> {
+export async function entrar(_: EstadoLogin, datos: FormData): Promise<EstadoLogin> {
   const email = String(datos.get("email") ?? "").trim();
-  if (!email) return { error: "Escribe tu email." };
+  const contrasena = String(datos.get("contrasena") ?? "");
+  if (!email || !contrasena) return { error: "Escribe tu email y tu contraseña.", email };
 
-  const origen = (await headers()).get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL ?? "";
-  const supabase = await crearClienteServidor();
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: `${origen}/auth/callback`, shouldCreateUser: false },
-  });
-  if (error) return { error: "No se pudo enviar el enlace. ¿Es el email con el que te registraste?" };
-  return { enviado: true };
+  if (!configSupabase()) {
+    return {
+      email,
+      error:
+        "Faltan o están mal escritas las variables NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY en Vercel. Revísalas y vuelve a desplegar.",
+    };
+  }
+
+  try {
+    const supabase = await crearClienteServidor();
+    const { error } = await supabase.auth.signInWithPassword({ email, password: contrasena });
+    if (error) {
+      console.error("signInWithPassword:", error.code, error.status, error.message);
+      return { email, error: mensajeDeError(error.code, error.message) };
+    }
+  } catch (e) {
+    console.error("signInWithPassword:", e);
+    return { email, error: `No se pudo contactar con Supabase: ${e instanceof Error ? e.message : String(e)}` };
+  }
+
+  redirect("/");
+}
+
+function mensajeDeError(codigo: string | undefined, mensaje: string) {
+  switch (codigo) {
+    case "invalid_credentials":
+      return "Email o contraseña incorrectos.";
+    case "email_not_confirmed":
+      return "Tu usuario no está confirmado. En Supabase, Authentication → Users, confírmalo o créalo con «Auto Confirm User».";
+    case "over_request_rate_limit":
+      return "Demasiados intentos seguidos. Espera un momento y vuelve a probar.";
+    case "email_provider_disabled":
+      return "El acceso por email está desactivado en Supabase (Authentication → Sign In / Providers → Email).";
+    default:
+      return `Supabase ha devuelto un error: ${mensaje}${codigo ? ` (${codigo})` : ""}`;
+  }
 }
 
 export async function cerrarSesion() {

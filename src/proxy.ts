@@ -1,13 +1,21 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { configSupabase } from "@/lib/supabase/config";
 
 // Refresca la sesión de Supabase en cada petición y manda a /login a quien no la tenga.
 export async function proxy(request: NextRequest) {
   let respuesta = NextResponse.next({ request });
+  const config = configSupabase();
+  // Sin configuración no hay sesión posible; /login explica qué falta.
+  if (!config) {
+    return request.nextUrl.pathname.startsWith("/login")
+      ? respuesta
+      : NextResponse.redirect(new URL("/login", request.url));
+  }
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    config.url,
+    config.clave,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
@@ -21,7 +29,13 @@ export async function proxy(request: NextRequest) {
   );
 
   const { data } = await supabase.auth.getUser();
-  const publica = ["/login", "/auth"].some((r) => request.nextUrl.pathname.startsWith(r));
+  const publica = request.nextUrl.pathname.startsWith("/login");
+  if (data.user && publica) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
   if (!data.user && !publica) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";

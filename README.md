@@ -34,8 +34,8 @@ Todo está en `supabase/migrations/`. Cada usuario solo ve sus pedidos y ejempla
 
 1. Crea un proyecto en [supabase.com](https://supabase.com) (plan gratuito).
 2. En **SQL Editor**, ejecuta `supabase/migrations/20261013000000_esquema_inicial.sql`. Otra opción es usar la CLI con `supabase link` y `supabase db push`.
-3. En **Authentication → Users**, crea tu usuario con tu email ("Add user"). La app no deja registrarse a nadie más.
-4. En **Authentication → URL Configuration**, pon como *Site URL* la dirección de Vercel y añade `http://localhost:3000/**` a *Redirect URLs*.
+3. En **Authentication → Users → Add user → Create new user**, crea tu usuario con email y contraseña y marca *Auto Confirm User*. La app entra con email y contraseña y no deja registrarse a nadie más.
+4. En **Authentication → Sign In / Providers**, desactiva *Allow new users to sign up*.
 
 ### 2. Proceso nocturno (GitHub Actions)
 
