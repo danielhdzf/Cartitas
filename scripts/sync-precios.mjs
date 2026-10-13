@@ -36,7 +36,7 @@ async function comprobar({ error }, que) {
 }
 
 async function main() {
-  const supabase = createClient(variable("SUPABASE_URL"), variable("SUPABASE_SERVICE_ROLE_KEY"), {
+  const supabase = createClient(new URL(variable("SUPABASE_URL").trim()).origin, variable("SUPABASE_SERVICE_ROLE_KEY").trim(), {
     auth: { persistSession: false },
   });
 

@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { configSupabase } from "@/lib/supabase/config";
 import { crearClienteServidor } from "@/lib/supabase/server";
 
 export type EstadoLogin = { error?: string; enviado?: boolean };
@@ -10,10 +11,10 @@ export async function enviarEnlace(_: EstadoLogin, datos: FormData): Promise<Est
   const email = String(datos.get("email") ?? "").trim();
   if (!email) return { error: "Escribe tu email." };
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+  if (!configSupabase()) {
     return {
       error:
-        "Faltan las variables NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY en Vercel. Añádelas y vuelve a desplegar.",
+        "Faltan o están mal escritas las variables NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY en Vercel. Revísalas y vuelve a desplegar.",
     };
   }
 
