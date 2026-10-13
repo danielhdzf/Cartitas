@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+:root {
+  --fondo: #f7f5f0;
+  --superficie: #ffffff;
+  --texto: #1d1b20;
+  --apagado: #6b6873;
+  --borde: #e3dfd6;
+  --acento: #2f5bd3;
+  --ganancia: #1f7a4d;
+  --perdida: #b3261e;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #16151a;
+    --superficie: #201f25;
+    --texto: #ecebf0;
+    --apagado: #a19ead;
+    --borde: #33313a;
+    --acento: #8aa8ff;
+    --ganancia: #5cc98f;
+    --perdida: #ff8a80;
+  }
+}
+
+@theme inline {
+  --color-fondo: var(--fondo);
+  --color-superficie: var(--superficie);
+  --color-texto: var(--texto);
+  --color-apagado: var(--apagado);
+  --color-borde: var(--borde);
+  --color-acento: var(--acento);
+  --color-ganancia: var(--ganancia);
+  --color-perdida: var(--perdida);
+  --font-sans: var(--font-geist-sans);
+}
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+@layer components {
+  .campo {
+    @apply rounded-lg border border-borde bg-superficie px-3 py-2 text-base outline-none focus:border-acento;
+  }
+  .boton {
+    @apply rounded-lg bg-acento px-4 py-2 font-medium text-white disabled:opacity-60 dark:text-fondo;
+  }
+  .tarjeta {
+    @apply rounded-xl border border-borde bg-superficie p-4;
+  }
+}
