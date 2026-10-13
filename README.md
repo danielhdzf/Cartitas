@@ -60,6 +60,8 @@ npm install
 npm run dev
 ```
 
+También se puede levantar un Supabase local con Docker (`npx supabase start`): aplica las migraciones de `supabase/migrations/` y muestra la URL y las claves para `.env.local`. Para cargar precios de prueba, `scripts/sync-precios.mjs` acepta `CARDMARKET_BASE_URL` apuntando a una carpeta con la misma estructura que la de CardMarket.
+
 ## Pruebas
 
 ```bash

@@ -3,7 +3,8 @@
 
 export const ID_JUEGO_POKEMON = 6;
 
-const BASE = "https://downloads.s3.cardmarket.com/productCatalog";
+// Se puede cambiar con CARDMARKET_BASE_URL para probar con ficheros locales.
+const BASE = process.env.CARDMARKET_BASE_URL ?? "https://downloads.s3.cardmarket.com/productCatalog";
 
 export const urls = (idJuego = ID_JUEGO_POKEMON) => ({
   priceGuide: `${BASE}/priceGuide/price_guide_${idJuego}.json`,
